@@ -1,4 +1,6 @@
 #[macro_use] extern crate rocket;
+extern crate diesel;
+#[macro_use] extern crate rocket_sync_db_pools;
 use rocket::{serde::json::{ Value, json }, response::status };
 mod auth;
 use auth::BasicAuth;
@@ -12,9 +14,11 @@ fn not_found() -> Value {
 fn not_authorized() -> Value {
     json!({"message":"Ups, you are not allow here!"})
 }
+#[database("sqlite")]
+struct DbConn(diesel::SqliteConnection);
 
 #[get("/rustaceans")]
-fn get_rustaceans(_auth: BasicAuth) -> Value {
+fn get_rustaceans(_auth: BasicAuth, _db: DbConn ) -> Value {
     json!([{"id": 1, "name": "Jhon Doe"}, {"id": 2, "name": "Jhon Doe Again"}])
 }
 
@@ -48,6 +52,7 @@ async fn main(){
     update_rustacean,
     delete_rustacean,
    ])
+   .attach(DbConn::fairing())
    .register("/", catchers![ not_found, not_authorized ])
    .launch().await; 
 }

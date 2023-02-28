@@ -1,4 +1,3 @@
--- Your SQL goes here
 CREATE TABLE rustaceans(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR NOT NULL,
